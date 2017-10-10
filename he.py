@@ -40,18 +40,13 @@ def process(file_in, file_out):
                         i -= 1
 
                     elif c.tag == 'base':
+                        word.text = token.get('surface')
+                        word.set('lem', c.get('lexiconItem', token.get('surface')))
                         if len(c):
-                            if c[0].tag == 'punctuation':
-                                word.text = token.get('surface')
-                            else:
-                                word.text = c.get('lexiconItem', token.get('surface'))
-
                             if c[0].tag == 'verb':
                                 word.set('tree', 'verb-{}{}{}'.format(c[0].get('number', '-')[0], c[0].get('person', '-'), c[0].get('tense', '')))
                             else:
                                 word.set('tree', c[0].tag)
-                        else:
-                            word.text = c.get('lexiconItem')
 
                     i += 1
 
