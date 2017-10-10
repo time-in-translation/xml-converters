@@ -42,6 +42,7 @@ def process(file_in, file_out):
         tree = etree.ElementTree(text)
         tree.write(file_out, pretty_print=True, xml_declaration=True, encoding='utf-8')
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('file_in', type=str, help='Input file')
