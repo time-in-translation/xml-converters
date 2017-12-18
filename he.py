@@ -25,6 +25,7 @@ def process(file_in, file_out):
                     if best is None or float(analysis.get('score')) > float(best.get('score')):
                         best = analysis
 
+                has_prefix = False
                 for c in best:
                     word = etree.SubElement(sentence, 'w')
                     word.set('id', 'w{}.{}.{}'.format(p.get('id'), s.get('id'), i))
@@ -32,6 +33,7 @@ def process(file_in, file_out):
                     if c.tag == 'prefix':
                         word.text = c.get('surface')
                         word.set('tree', c.get('function'))
+                        has_prefix = True
 
                     elif c.tag == 'suffix':
                         prev = word.getprevious()
@@ -40,7 +42,7 @@ def process(file_in, file_out):
                         i -= 1
 
                     elif c.tag == 'base':
-                        word.text = token.get('surface')
+                        word.text = c.get('lexiconItem') if has_prefix else token.get('surface')
                         word.set('lem', c.get('lexiconItem', token.get('surface')))
                         if len(c):
                             if c[0].tag == 'verb':
@@ -52,6 +54,7 @@ def process(file_in, file_out):
 
     tree = etree.ElementTree(text)
     tree.write(file_out, pretty_print=True, xml_declaration=True, encoding='utf-8')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
