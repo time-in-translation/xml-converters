@@ -34,6 +34,7 @@ def process(file_in, file_out):
                         word.text = c.get('surface')
                         word.set('tree', c.get('function'))
                         has_prefix = True
+                        prefix = word.text
 
                     elif c.tag == 'suffix':
                         prev = word.getprevious()
@@ -42,7 +43,7 @@ def process(file_in, file_out):
                         i -= 1
 
                     elif c.tag == 'base':
-                        word.text = c.get('lexiconItem') if has_prefix else token.get('surface')
+                        word.text = token.get('surface')[len(prefix):] if has_prefix else token.get('surface')
                         word.set('lem', c.get('lexiconItem', token.get('surface')))
                         if len(c):
                             if c[0].tag == 'verb':
