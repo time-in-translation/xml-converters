@@ -44,8 +44,8 @@ def process(file_in, file_out):
             word.set('tree', tag)
             word.set('lem', lemma)
 
-            # The 'SENT' marks a sentence end
-            if tag == 'SENT':
+            # The 'SENT' marks a sentence end in Greek, Z.Fst, Z.Int, Z.Exc for Estonian
+            if tag in ['SENT', 'Z.Fst', 'Z.Int', 'Z.Exc']:
                 sentence_start = True
 
         tree = etree.ElementTree(text)
