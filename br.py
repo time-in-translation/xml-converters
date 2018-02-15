@@ -2,6 +2,7 @@
 
 import argparse
 import codecs
+import re
 
 from lxml import etree
 
@@ -25,26 +26,21 @@ def process(file_in, file_out):
             sentence = etree.SubElement(paragraph, 's')
             sentence.set('id', 's{}.{}'.format(i, j))
 
-            k = 1
-            for wt in line.split('$'):
-                if not wt:
+            results = []
+            wts = re.split(r'\^(.*?)\$', line)
+            for n, wt in enumerate(wts):
+                if n % 2 == 0:
+                    w = wt.strip()
+                    if w:
+                        ws = w.split()
+                        for w in ws:
+                            results.append([w, w, 'punct'])
                     continue
 
-                if len(wt.split('/', 1)) >= 2:  # If there is an analysis...
-                    word, lt = wt.split('/', 1)  # Split word from analysis
+                elif len(wt.split('/', 1)) >= 2:  # If there is an analysis...
+                    w, lt = wt.split('/', 1)  # Split word from analysis
 
                     lt0 = lt.split('/')[0]  # Take the first analysis
-                    before, w = word.split('^')
-
-                    if before.strip():
-                        b = before.strip()
-
-                        word = etree.SubElement(sentence, 'w')
-                        word.set('id', 'w{}.{}.{}'.format(i, j, k))
-                        word.text = b
-                        word.set('lem', b)
-                        word.set('tree', '')
-                        k += 1
 
                     if lt0.startswith('*'):  # A star denotes no analysis is
                         w = w.strip()
@@ -57,20 +53,35 @@ def process(file_in, file_out):
                         w = w.strip()
                         lemma = l.strip()
                         tree = t.replace('><', '-').replace('<', '-').replace('>', '')  # Replace <> with dashes
+
                 else:
                     w = wt.strip()
                     lemma = wt.strip()
                     tree = ''
 
-                word = etree.SubElement(sentence, 'w')
-                word.set('id', 'w{}.{}.{}'.format(i, j, k))
-                word.text = w
-                word.set('lem', lemma)
-                word.set('tree', tree)
+                results.append([w, lemma, tree])
+
+            k = 1
+            for n, wlt in enumerate(results):
+                if wlt[0] == u'”' and k == 1:
+                    word = etree.SubElement(prev_s, 'w')
+                    word.set('id', 'w{}.{}.{}'.format(i, prev_j, prev_k))
+                    k = 0
+                else:
+                    word = etree.SubElement(sentence, 'w')
+                    word.set('id', 'w{}.{}.{}'.format(i, j, k))
+
+                word.text = wlt[0]
+                word.set('lem', wlt[1])
+                word.set('tree', wlt[2])
                 k += 1
 
                 # sent marks a sentence end, create a new sentence SubElement and reset the word counter (k)
-                if tree == 'sent':
+                if wlt[2] == 'sent' and n != len(results) - 1:
+                    prev_j = j
+                    prev_k = k
+                    prev_s = sentence
+
                     j += 1
                     sentence = etree.SubElement(paragraph, 's')
                     sentence.set('id', 's{}.{}'.format(i, j))
