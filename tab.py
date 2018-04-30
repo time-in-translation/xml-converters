@@ -6,18 +6,21 @@ import codecs
 from lxml import etree
 
 
-def process(file_in, file_out):
+def process(file_in, file_out, sentence_tokenized=False):
     with codecs.open(file_in, 'r', encoding='utf-8') as f:
         text = etree.Element('text')
 
         i = j = k = 0
         paragraph_start = sentence_start = True
 
-        for line in f:
+        for n, line in enumerate(f):
             line = line.strip()
 
             if not line:
-                paragraph_start = True
+                if sentence_tokenized and not sentence_start:
+                    sentence_start = True
+                else:
+                    paragraph_start = True
                 continue
 
             if paragraph_start:
@@ -35,17 +38,32 @@ def process(file_in, file_out):
                 sentence.set('id', 's{}.{}'.format(i, j))
                 sentence_start = False
 
-            w, tag, lemma = line.split('\t')
+            # Split into word, tag and lemma (or word and tag if this line only contains two values)
+            split_line = line.split('\t')
+            if 1 <= len(split_line) <= 3:
+                w = split_line[0]
+                tag = ''
+                lemma = ''
+
+                if len(split_line) >= 2:
+                    tag = split_line[1]
+
+                    if len(split_line) >= 3:
+                        lemma = split_line[2]
+            else:
+                raise ValueError('Incorrect number at line {}'.format(n))
 
             k += 1
             word = etree.SubElement(sentence, 'w')
             word.set('id', 'w{}.{}.{}'.format(i, j, k))
             word.text = w
-            word.set('tree', tag)
-            word.set('lem', lemma)
+            if tag:
+                word.set('tree', tag)
+            if lemma:
+                word.set('lem', lemma)
 
             # The 'SENT' marks a sentence end in Greek, Z.Fst, Z.Int, Z.Exc for Estonian
-            if tag in ['SENT', 'Z.Fst', 'Z.Int', 'Z.Exc']:
+            if not sentence_tokenized and tag in ['SENT', 'Z.Fst', 'Z.Int', 'Z.Exc']:
                 sentence_start = True
 
         tree = etree.ElementTree(text)
@@ -56,6 +74,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('file_in', type=str, help='Input file')
     parser.add_argument('file_out', type=str, help='Output file')
+    parser.add_argument('--tok', action='store_true', help='Is the file sentence-tokenized?')
     args = parser.parse_args()
 
-    process(args.file_in, args.file_out)
+    process(args.file_in, args.file_out, args.tok)
