@@ -12,8 +12,10 @@ def process(file_in, file_out, sentence_tokenized=False):
 
         i = j = k = 0
         paragraph_start = sentence_start = True
+        end_after_next = False
 
-        for n, line in enumerate(f):
+        lines = f.readlines()
+        for n, line in enumerate(lines):
             line = line.strip()
 
             if not line:
@@ -38,20 +40,7 @@ def process(file_in, file_out, sentence_tokenized=False):
                 sentence.set('id', 's{}.{}'.format(i, j))
                 sentence_start = False
 
-            # Split into word, tag and lemma (or word and tag if this line only contains two values)
-            split_line = line.split('\t')
-            if 1 <= len(split_line) <= 3:
-                w = split_line[0]
-                tag = ''
-                lemma = ''
-
-                if len(split_line) >= 2:
-                    tag = split_line[1]
-
-                    if len(split_line) >= 3:
-                        lemma = split_line[2]
-            else:
-                raise ValueError('Incorrect number at line {}'.format(n))
+            w, tag, lemma = split_line(line, n)
 
             k += 1
             word = etree.SubElement(sentence, 'w')
@@ -62,12 +51,44 @@ def process(file_in, file_out, sentence_tokenized=False):
             if lemma:
                 word.set('lem', lemma)
 
+            if end_after_next:
+                sentence_start = True
+                end_after_next = False
+
             # The 'SENT' marks a sentence end in Greek, Z.Fst, Z.Int, Z.Exc for Estonian
             if not sentence_tokenized and tag in ['SENT', 'Z.Fst', 'Z.Int', 'Z.Exc']:
-                sentence_start = True
+                # Peek forward if we're not dealing with a dialogue
+                if lines[n+1]:
+                    _, next_tag, _ = split_line(lines[n+1], n+1)
+                    if next_tag in ['Z.Quo']:
+                        end_after_next = True
+                    else:
+                        sentence_start = True
+                else:
+                    sentence_start = True
 
         tree = etree.ElementTree(text)
         tree.write(file_out, pretty_print=True, xml_declaration=True, encoding='utf-8')
+
+
+def split_line(line, n):
+    # Split into word, tag and lemma (or word and tag if this line only contains two values)
+    line_split = line.split('\t')
+
+    if 1 <= len(line_split) <= 3:
+        w = line_split[0]
+        tag = ''
+        lemma = ''
+
+        if len(line_split) >= 2:
+            tag = line_split[1]
+
+            if len(line_split) >= 3:
+                lemma = line_split[2]
+    else:
+        raise ValueError('Incorrect at line {}'.format(n))
+
+    return w, tag, lemma
 
 
 if __name__ == "__main__":
