@@ -24,20 +24,35 @@ def process(file_in, file_out):
             sentence = etree.SubElement(paragraph, 's')
             sentence.set('id', 's{}.{}'.format(i, j))
 
-            for k, wt in enumerate(line.split(), start=1):
+            tokens = line.split()
+            end_after_next = False
+            k = 0
+            for n, wt in enumerate(tokens):
                 w, t = wt.split('#')
 
                 word = etree.SubElement(sentence, 'w')
+                k += 1
                 word.set('id', 'w{}.{}.{}'.format(i, j, k))
                 word.text = w
                 word.set('tree', t)
 
                 # The '。' marks a sentence end, create a new sentence SubElement,
+                # unless the next character is an end quote, or
                 # unless this is the last character of the line
-                if w == '。' and k != len(line.split()):
-                    j += 1
-                    sentence = etree.SubElement(paragraph, 's')
-                    sentence.set('id', 's{}.{}'.format(i, j))
+                if w == '。' or end_after_next:
+                    if n + 1 == len(tokens):
+                        continue
+                    else:
+                        next_w, next_t = tokens[n + 1].split('#')
+                        if next_w == '”':
+                            end_after_next = True
+                            continue
+
+                        j += 1
+                        sentence = etree.SubElement(paragraph, 's')
+                        sentence.set('id', 's{}.{}'.format(i, j))
+                        k = 0
+                        end_after_next = False
 
         tree = etree.ElementTree(text)
         tree.write(file_out, pretty_print=True, xml_declaration=True, encoding='utf-8')
