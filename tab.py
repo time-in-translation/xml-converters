@@ -55,12 +55,12 @@ def process(file_in, file_out, sentence_tokenized=False):
                 sentence_start = True
                 end_after_next = False
 
-            # The 'SENT' marks a sentence end in Greek, Z.Fst, Z.Int, Z.Exc for Estonian
-            if not sentence_tokenized and tag in ['SENT', 'Z.Fst', 'Z.Int', 'Z.Exc']:
+            # The 'SENT' marks a sentence end in Greek, Z.Fst, Z.Int, Z.Exc for Estonian, PUNCT.Final for Catalan
+            if not sentence_tokenized and tag in ['SENT', 'Z.Fst', 'Z.Int', 'Z.Exc', 'PUNCT.Final']:
                 # Peek forward if we're not dealing with a dialogue
                 if lines[n+1]:
                     _, next_tag, _ = split_line(lines[n+1], n+1)
-                    if next_tag in ['Z.Quo']:
+                    if next_tag in ['Z.Quo'] or (lemma != ':' and next_tag in ['PUNCT']):
                         end_after_next = True
                     else:
                         sentence_start = True
@@ -93,8 +93,8 @@ def split_line(line, n):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('file_in', type=str, help='Input file')
-    parser.add_argument('file_out', type=str, help='Output file')
+    parser.add_argument('file_in', help='Input file')
+    parser.add_argument('file_out', help='Output file')
     parser.add_argument('--tok', action='store_true', help='Is the file sentence-tokenized?')
     args = parser.parse_args()
 
