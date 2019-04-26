@@ -1,20 +1,15 @@
-# -*- coding: utf-8 -*-
-
 import argparse
 import os
 import subprocess
 
 from lxml import etree
 
-CONLL_S_FORMAT = '# sent_id = {}\n'
-CONLL_W_FORMAT = '{0}\t{1}\t{2}\t{3}\t{3}\t_\t_\t_\t_\t_\n'
+from conll_utils import POS_TAGS, CONLL_S_FORMAT, CONLL_W_FORMAT
 
 MALT_COMMAND = 'java -jar {0} -c {1} -m parse -i {2} -o {3}'
 MALT_LOCATION = '/opt/maltparser-1.9.2'
 MALT_PARSER = 'maltparser-1.9.2.jar'
 MALT_CONFIG = '{0}-parser'
-
-POS_TAGS = {'de': 'tree', 'en': 'tree', 'es': 'tree', 'fr': 'pos', 'it': 'pos', 'nl': 'tree', 'pl': 'tree', 'ru': 'tree'}
 
 
 def process_single(language, in_file, out_file):
