@@ -15,6 +15,8 @@ def process_single(language, swda_transcript, out_file):
     text.set('topic', swda_transcript.topic_description)
 
     current_utterance_index = 0
+    prev_act_tag = ''
+    prev_damsl_act_tag = ''
     # Load the file and loop over the sentences
     for utterance in swda_transcript.utterances:
         if current_utterance_index != utterance.utterance_index:
@@ -25,11 +27,18 @@ def process_single(language, swda_transcript, out_file):
         i = str(current_utterance_index)
         j = str(utterance.subutterance_index)
 
+        # A '+' signals continuation of the previous utterance: use that dialog act annotation
+        act_tag = utterance.act_tag if utterance.act_tag != '+' else prev_act_tag
+        damsl_act_tag = utterance.damsl_act_tag() if utterance.damsl_act_tag() != '+' else prev_damsl_act_tag
+
         sentence = etree.SubElement(paragraph, 's')
         sentence.set('id', 's{}.{}'.format(i, j))
         sentence.set('caller', utterance.caller)
-        sentence.set('act_tag', utterance.act_tag)
-        sentence.set('damsl_act_tag', utterance.damsl_act_tag())
+        sentence.set('act_tag', act_tag)
+        sentence.set('damsl_act_tag', damsl_act_tag)
+
+        prev_act_tag = act_tag
+        prev_damsl_act_tag = damsl_act_tag
 
         # Use lemmata from WordNet, but use the original PoS-tags (TreeTagger-like)
         lem_list = utterance.pos_lemmas(wn_lemmatize=True)
