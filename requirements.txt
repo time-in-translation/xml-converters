@@ -7,7 +7,7 @@
 certifi==2019.3.9         # via requests
 chardet==3.0.4            # via requests
 idna==2.8                 # via requests
-lxml==4.3.1
+lxml==4.4.0
 nltk==3.4.3
 pyconll==1.1.4
 requests==2.21.0          # via pyconll
