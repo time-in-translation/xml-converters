@@ -55,8 +55,9 @@ def process(file_in, file_out, sentence_tokenized=False):
                 sentence_start = True
                 end_after_next = False
 
-            # The 'SENT' marks a sentence end in Greek, Z.Fst, Z.Int, Z.Exc for Estonian, PUNCT.Final for Catalan
-            if not sentence_tokenized and tag in ['SENT', 'Z.Fst', 'Z.Int', 'Z.Exc', 'PUNCT.Final']:
+            # The 'SENT' marks a sentence end in Greek, Z.Fst, Z.Int, Z.Exc for Estonian,
+            # PUNCT.Final for Catalan, Fp for Portuguese
+            if not sentence_tokenized and tag in ['SENT', 'Z.Fst', 'Z.Int', 'Z.Exc', 'PUNCT.Final', 'Fp']:
                 # Peek forward if we're not dealing with a dialogue
                 if lines[n+1]:
                     _, next_tag, _ = split_line(lines[n+1], n+1)
