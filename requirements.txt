@@ -6,10 +6,13 @@
 #
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
+click==7.1.1              # via nltk
 idna==2.8                 # via requests
-lxml==4.4.2
-nltk==3.4.5
-pyconll==2.2.1
+joblib==0.14.1            # via nltk
+lxml==4.4.2               # via -r requirements.in
+nltk==3.5                 # via -r requirements.in
+pyconll==2.2.1            # via -r requirements.in
+regex==2020.4.4           # via nltk
 requests==2.22.0          # via pyconll
-six==1.13.0               # via nltk
+tqdm==4.45.0              # via nltk
 urllib3==1.25.7           # via requests
