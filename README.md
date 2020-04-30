@@ -42,10 +42,6 @@ Converts output from the [Stanford CoreNLP Log-linear Part-of-Speech tagger](htt
 
 The repository also contains some other scripts.
 
-### merge_alignments.py
-
-Merges multiple Hunalign alignment files into one.
-
 ### remove_enters.py
 
 Strips new lines from a file.
