@@ -1,12 +1,24 @@
 # xml-converters
 
-This repository contains Python3 scripts to convert various formats to the [XML format used in OPUS](http://opus.nlpl.eu/).
+This repository contains Python scripts to convert various formats to the [XML format used in OPUS](http://opus.nlpl.eu/).
 
 ## Generic
 
-### tab.py
+### treetagger2opus.py
 
-Converts output from [TreeTagger](http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/) to the OPUS format.
+Converts tab-separated output from [TreeTagger](http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/) to the OPUS format.
+
+### opus2conll.py
+
+Converts the OPUS format to CONLL. 
+
+### conll2opus.py
+
+Converts CONLL to the OPUS format. 
+
+### swda2opus.py
+
+Converts SWDA to the OPUS format.
 
 ## Language specific
 
@@ -25,3 +37,15 @@ Converts output from [the Morpheusz tagger](http://ws.clarin-pl.eu/tager.shtml?e
 ### zh.py (Mandarin Chinese)
 
 Converts output from the [Stanford CoreNLP Log-linear Part-of-Speech tagger](https://nlp.stanford.edu/software/tagger.shtml) to the OPUS format.
+
+## Other scripts
+
+The repository also contains some other scripts.
+
+### merge_alignments.py
+
+Merges multiple Hunalign alignment files into one.
+
+### remove_enters.py
+
+Strips new lines from a file.
