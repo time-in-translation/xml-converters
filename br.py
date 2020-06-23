@@ -66,9 +66,11 @@ def process(file_in, file_out):
             k = 1
             for n, wlt in enumerate(results):
                 # Add dialogue markers in the first position to the previous sentence
-                if wlt[0] == u'”' and k == 1:
+                if wlt[0] in [u'”', u'»'] and k == 1:
                     word = etree.SubElement(prev_s, 'w')
                     word.set('id', 'w{}.{}.{}'.format(i, prev_j, prev_k))
+                    j -= 1
+                    paragraph.remove(sentence)
                     k = 0
                 else:
                     word = etree.SubElement(sentence, 'w')
