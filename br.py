@@ -19,6 +19,8 @@ def process(file_in, file_out):
                 i += 1
                 continue
 
+            line = line.replace('$^./.<sent>$^./.<sent>$^./.<sent>$', '$^.../...<ellipsis>$')
+
             paragraph = etree.SubElement(text, 'p')
             paragraph.set('id', str(i))
 
@@ -42,7 +44,7 @@ def process(file_in, file_out):
 
                     lt0 = lt.split('/')[0]  # Take the first analysis
 
-                    if lt0.startswith('*'):  # A star denotes no analysis is
+                    if lt0.startswith('*'):  # A star denotes no analysis was found
                         w = w.strip()
                         lemma = w
                         tree = ''
@@ -63,6 +65,7 @@ def process(file_in, file_out):
 
             k = 1
             for n, wlt in enumerate(results):
+                # Add dialogue markers in the first position to the previous sentence
                 if wlt[0] == u'”' and k == 1:
                     word = etree.SubElement(prev_s, 'w')
                     word.set('id', 'w{}.{}.{}'.format(i, prev_j, prev_k))
