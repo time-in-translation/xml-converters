@@ -19,7 +19,9 @@ def process(file_in, file_out):
                 i += 1
                 continue
 
-            line = line.replace('$^./.<sent>$^./.<sent>$^./.<sent>$', '$^.../...<ellipsis>$')
+            line = line.replace('^./.<sent>$^./.<sent>$^./.<sent>$', '^.../...<ellipsis>$')  # fixes ellipsis
+            line = line.replace('$^!/!<sent>$”', '$^!/!<punct>$”')  # !” is not a sentence ending
+            line = line.replace('$^?/?<sent>$”', '$^?/?<punct>$”')  # ?” is not a sentence ending
 
             paragraph = etree.SubElement(text, 'p')
             paragraph.set('id', str(i))
@@ -69,9 +71,11 @@ def process(file_in, file_out):
                 if wlt[0] in [u'”', u'»'] and k == 1:
                     word = etree.SubElement(prev_s, 'w')
                     word.set('id', 'w{}.{}.{}'.format(i, prev_j, prev_k))
-                    j -= 1
-                    paragraph.remove(sentence)
                     k = 0
+                    prev_k += 1
+                    # Remove the current sentence if this was the last word of the paragraph.
+                    if n == len(results) - 1:
+                        paragraph.remove(sentence)
                 else:
                     word = etree.SubElement(sentence, 'w')
                     word.set('id', 'w{}.{}.{}'.format(i, j, k))
