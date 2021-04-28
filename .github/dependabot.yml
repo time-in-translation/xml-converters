@@ -1,0 +1,16 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: pyconll
+    versions:
+    - 2.3.3
+    - 3.0.3
+  - dependency-name: lxml
+    versions:
+    - 4.6.2
