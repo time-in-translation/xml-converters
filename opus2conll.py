@@ -49,9 +49,13 @@ if __name__ == '__main__':
     parser.add_argument('language', help='Language')
     parser.add_argument('file_in', help='Input file')
     parser.add_argument('file_out', help='Output file')
+    parser.add_argument('--parse', action='store_true', help='Whether or not to parse with MaltParser')
     args = parser.parse_args()
 
     tmp_file = 'conll.tmp'
 
     process_single(args.language, args.file_in, tmp_file)
-    malt_parse(args.language, tmp_file, args.file_out)
+    if args.parse:
+        malt_parse(args.language, tmp_file, args.file_out)
+    else:
+        os.rename(tmp_file, args.file_out)
