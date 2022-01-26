@@ -23,6 +23,19 @@ def process(in_file, out_file):
             sentence = etree.SubElement(paragraph, 's')
             sentence.set('id', 's{}.{}'.format(i, j))
             for k, tok in enumerate(s.xpath('tok'), start=1):
+                # If we find a $ token, add a new paragraph and reset the sentence counter
+                if tok.getchildren()[0].text == '$':
+                    if len(sentence) == 0:
+                        sentence.getparent().remove(sentence)
+
+                    i += 1
+                    paragraph = etree.SubElement(text, 'p')
+                    paragraph.set('id', str(i))
+                    j = 1
+                    sentence = etree.SubElement(paragraph, 's')
+                    sentence.set('id', 's{}.{}'.format(i, j))
+                    continue
+
                 word = etree.SubElement(sentence, 'w')
                 word.set('id', 'w{}.{}.{}'.format(i, j, k))
                 for child in tok:
@@ -32,14 +45,7 @@ def process(in_file, out_file):
                         word.set('lem', child.xpath('base')[0].text)
                         word.set('tree', child.xpath('ctag')[0].text)
 
-        # After a chunk with the 'last' attribute, add a new paragraph and reset the sentence counter
-        if chunk.get('last'):
-            i += 1
-            paragraph = etree.SubElement(text, 'p')
-            paragraph.set('id', str(i))
-            j = 1
-        else:
-            j += 1
+        j += 1
 
     tree = etree.ElementTree(text)
     tree.write(out_file, pretty_print=True, xml_declaration=True, encoding='utf-8')
